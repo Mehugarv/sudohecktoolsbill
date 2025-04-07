@@ -95,7 +95,7 @@ export default function Layout({ children }: LayoutProps) {
             <Link href="/">
               <a className="flex items-center gap-2">
                 <span className="font-bold text-xl gradient-text">
-                  Aryaman Ne Shopping Kari
+                  BillBuddy
                 </span>
               </a>
             </Link>
@@ -246,7 +246,7 @@ export default function Layout({ children }: LayoutProps) {
                   <Link href="/">
                     <a className="flex items-center">
                       <span className="font-bold text-xl gradient-text">
-                        Aryaman Ne Shopping Kari
+                        BillBuddy
                       </span>
                     </a>
                   </Link>
@@ -345,7 +345,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <p className="text-sm text-gray-500">
-                © 2025 Aryaman Ne Shopping Kari. All rights reserved.
+                © 2025 BillBuddy. All rights reserved.
               </p>
             </div>
             <div className="flex space-x-4">

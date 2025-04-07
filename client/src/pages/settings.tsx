@@ -25,6 +25,7 @@ import {
   CheckCircle2,
   ImagePlus,
   Trash,
+  Download,
 } from "lucide-react";
 import {
   Card,
@@ -263,17 +264,36 @@ export default function Settings() {
 
   const handleResetData = () => {
     try {
-      // Reset application data
-      storage.resetData();
-      
-      // Show success message
-      toast({
-        title: "Success",
-        description: "All application data has been reset",
-      });
-      
-      // Refresh the page to reflect changes
-      window.location.reload();
+      // Check if resetData function exists in storage
+      if (typeof storage.resetData === 'function') {
+        // Reset application data
+        storage.resetData();
+        
+        // Show success message
+        toast({
+          title: "Success",
+          description: "All application data has been reset",
+        });
+        
+        // Refresh the page to reflect changes
+        window.location.reload();
+      } else {
+        // Fallback: Delete individual keys from localStorage
+        localStorage.removeItem('shopDetails');
+        localStorage.removeItem('inventory');
+        localStorage.removeItem('billHistory');
+        localStorage.removeItem('categories');
+        localStorage.removeItem('settings');
+        localStorage.removeItem('customers');
+        
+        toast({
+          title: "Success",
+          description: "All application data has been reset",
+        });
+        
+        // Refresh the page to reflect changes
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Error resetting data:", error);
       toast({

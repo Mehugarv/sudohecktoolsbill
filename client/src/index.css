@@ -11,6 +11,18 @@
     @apply font-sans antialiased text-foreground;
   }
   
+  /* Fix for dialogs being cut off */
+  .dialog-container {
+    @apply max-h-[90vh] overflow-y-auto;
+  }
+  
+  /* Fix for mobile dialogs */
+  @media (max-width: 640px) {
+    .radix-dialog-content {
+      @apply w-[95vw] max-w-full !important;
+    }
+  }
+  
   /* Purple app theme based on the design in the images */
   .app-background {
     @apply bg-purple-100/70;

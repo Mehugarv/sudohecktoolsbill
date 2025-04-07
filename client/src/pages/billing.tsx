@@ -379,9 +379,9 @@ export default function Billing() {
     .filter(bill => {
       // Filter by search term
       const searchMatch = 
-        bill.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (bill.invoiceNumber && bill.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        bill.id.toLowerCase().includes(searchTerm.toLowerCase());
+        (bill.customer?.name ? bill.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) : false) ||
+        (bill.invoiceNumber ? bill.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) : false) ||
+        (bill.id ? bill.id.toLowerCase().includes(searchTerm.toLowerCase()) : false);
       
       // Filter by payment status
       const statusMatch = 
