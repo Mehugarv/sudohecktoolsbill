@@ -1,23 +1,36 @@
-import { ShopDetails, InventoryItem, Bill, Category } from "@shared/schema";
+import { ShopDetails, InventoryItem, Bill, Category, Customer } from "@shared/schema";
 
 const SHOP_DETAILS_KEY = "billmaker_shop_details";
 const INVENTORY_KEY = "billmaker_inventory";
 const BILL_HISTORY_KEY = "billmaker_bill_history";
 const CATEGORIES_KEY = "billmaker_categories";
 const SETTINGS_KEY = "billmaker_settings";
+const CUSTOMERS_KEY = "billmaker_customers";
 
 // Default shop details
 const DEFAULT_SHOP_DETAILS: ShopDetails = {
   name: "Your Shop",
+  tagline: "Quality Products & Services",
   address: "Shop Address",
+  city: "City",
+  state: "State",
+  postalCode: "000000",
+  country: "Country",
   contact: "Contact Number",
+  alternateContact: "",
   email: "",
   website: "",
   gst: "",
+  pan: "",
+  businessType: "Retail",
+  registrationNumber: "",
   logo: "",
-  currency: "$",
+  currency: "₹",
   footerText: "Thank you for your business!",
-  taxRate: 10,
+  termsAndConditions: "1. All goods must be returned within 7 days with receipt.\n2. No refunds on damaged items.\n3. Prices include all applicable taxes.",
+  bankDetails: "",
+  invoicePrefix: "INV",
+  taxRate: 18,
   theme: "light",
 };
 
@@ -153,6 +166,46 @@ export const storage = {
     localStorage.removeItem(BILL_HISTORY_KEY);
   },
 
+  // Customers Management
+  getCustomers: (): Customer[] => {
+    const stored = localStorage.getItem(CUSTOMERS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  },
+
+  saveCustomers: (customers: Customer[]): void => {
+    localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(customers));
+  },
+
+  addCustomer: (customer: Customer): Customer => {
+    const customers = storage.getCustomers();
+    const newCustomer = {
+      ...customer,
+    };
+    customers.push(newCustomer);
+    storage.saveCustomers(customers);
+    return newCustomer;
+  },
+
+  updateCustomer: (customer: Customer): void => {
+    const customers = storage.getCustomers();
+    const index = customers.findIndex((c) => c.name === customer.name);
+    if (index !== -1) {
+      customers[index] = customer;
+      storage.saveCustomers(customers);
+    }
+  },
+
+  deleteCustomer: (name: string): void => {
+    const customers = storage.getCustomers();
+    const filtered = customers.filter((c) => c.name !== name);
+    storage.saveCustomers(filtered);
+  },
+
+  getCustomerByName: (name: string): Customer | undefined => {
+    const customers = storage.getCustomers();
+    return customers.find((c) => c.name === name);
+  },
+
   // App Settings
   getSetting: (key: string, defaultValue: any): any => {
     const stored = localStorage.getItem(SETTINGS_KEY);
@@ -167,6 +220,17 @@ export const storage = {
     const settings = stored ? JSON.parse(stored) : {};
     settings[key] = value;
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  },
+
+  // Helper methods for business functionality
+  generateInvoiceNumber: (): string => {
+    const shopDetails = storage.getShopDetails();
+    const prefix = shopDetails.invoicePrefix || 'INV';
+    const date = new Date();
+    const year = date.getFullYear().toString().slice(-2);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const billCount = storage.getBillHistory().length + 1;
+    return `${prefix}/${year}${month}/${billCount.toString().padStart(4, '0')}`;
   },
 };
 
@@ -200,4 +264,26 @@ export const getFormattedDate = (dateString: string): string => {
     month: "short",
     day: "numeric",
   });
+};
+
+export const getFormattedDateTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+};
+
+export const getCurrentDateTime = (): string => {
+  return new Date().toISOString();
+};
+
+export const getDatePlusNDays = (days: number): string => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString();
 };
