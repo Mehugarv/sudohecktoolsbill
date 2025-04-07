@@ -32,7 +32,7 @@ export default function BillingHistory({ billHistory, onHistoryChange }: Billing
     // For this demo, we'll show a toast
     toast({
       title: `Invoice #${bill.id.slice(-3)}`,
-      description: `Viewing bill for ${bill.customer}`,
+      description: `Viewing bill for ${bill.customer.name}`,
     });
   };
   
@@ -63,7 +63,7 @@ export default function BillingHistory({ billHistory, onHistoryChange }: Billing
       doc.setFontSize(11);
       doc.text(`Invoice #: ${bill.id.slice(-3)}`, 20, 48);
       doc.text(`Date: ${getFormattedDate(bill.date)}`, 20, 54);
-      doc.text(`Customer: ${bill.customer}`, 150, 48, { align: "right" });
+      doc.text(`Customer: ${bill.customer.name}`, 150, 48, { align: "right" });
       
       doc.line(20, 60, 190, 60);
       
@@ -81,11 +81,33 @@ export default function BillingHistory({ billHistory, onHistoryChange }: Billing
       let y = 78;
       
       bill.items.forEach((item) => {
-        doc.text(item.name, 20, y);
-        doc.text(formatCurrency(item.price), 100, y);
-        doc.text(item.quantity.toString(), 130, y);
-        doc.text(formatCurrency(item.total), 160, y);
-        y += 8;
+        // Truncate and split long item names
+        let displayName = item.name;
+        if (displayName.length > 50) {
+          displayName = displayName.substring(0, 47) + "...";
+        }
+        
+        const maxWidth = 75;
+        const itemNameLines = doc.splitTextToSize(displayName, maxWidth);
+        
+        // Limit to max 2 lines
+        const linesCount = Math.min(itemNameLines.length, 2);
+        const lineHeight = 5;
+        
+        // Print item name (max 2 lines)
+        for (let i = 0; i < linesCount; i++) {
+          doc.text(itemNameLines[i], 20, y + (i * lineHeight));
+        }
+        
+        // Print other columns
+        const verticalOffset = linesCount > 1 ? lineHeight / 2 : 0;
+        doc.text(formatCurrency(item.price), 100, y + verticalOffset);
+        doc.text(item.quantity.toString(), 130, y + verticalOffset);
+        doc.text(formatCurrency(item.total), 160, y + verticalOffset);
+        
+        // Calculate row height based on number of lines
+        const rowHeight = Math.max(8, linesCount * lineHeight);
+        y += rowHeight;
       });
       
       doc.line(20, y, 190, y);
@@ -96,7 +118,7 @@ export default function BillingHistory({ billHistory, onHistoryChange }: Billing
       doc.text(formatCurrency(bill.subtotal), 160, y);
       y += 8;
       
-      doc.text("Tax (10%):", 130, y);
+      doc.text(`Tax (${bill.taxRate}%):`, 130, y);
       doc.text(formatCurrency(bill.tax), 160, y);
       y += 8;
       
@@ -108,7 +130,7 @@ export default function BillingHistory({ billHistory, onHistoryChange }: Billing
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
       doc.text("Thank you for your business!", 105, 250, { align: "center" });
-      doc.text("Generated with BillMaker", 105, 255, { align: "center" });
+      doc.text("Generated with BillBuddy", 105, 255, { align: "center" });
       
       // Save the PDF
       doc.save(`Invoice-${bill.id.slice(-3)}.pdf`);
@@ -159,7 +181,7 @@ export default function BillingHistory({ billHistory, onHistoryChange }: Billing
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-medium">Invoice #{bill.id.slice(-3)}</h3>
-                    <p className="text-sm text-slate-500">Customer: {bill.customer}</p>
+                    <p className="text-sm text-slate-500">Customer: {bill.customer.name}</p>
                     <p className="text-xs text-slate-400">
                       {getFormattedDate(bill.date)} • {bill.items.length} items • {formatCurrency(bill.total)}
                     </p>

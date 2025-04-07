@@ -260,7 +260,14 @@ export const generateId = (): string => {
 
 export const formatCurrency = (value: number, currencySymbol?: string): string => {
   const shopDetails = storage.getShopDetails();
-  const symbol = currencySymbol || shopDetails.currency || "$";
+  
+  // Make sure we have a valid currency symbol
+  let symbol = currencySymbol || shopDetails.currency || "$";
+  
+  // Ensure symbol is not empty or just a dash
+  if (!symbol || symbol === "-" || symbol.trim() === "") {
+    symbol = "$";
+  }
   
   // Format the number with proper spacing
   const formattedValue = value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");

@@ -198,8 +198,10 @@ export default function BillGenerator({
       
       bill.items.forEach(item => {
         const row = document.createElement('tr');
+        // Truncate long item names
+        const displayName = item.name.length > 50 ? item.name.substring(0, 47) + "..." : item.name;
         row.innerHTML = `
-          <td class="py-2 border-b border-slate-200 max-w-[250px] break-words">${item.name}</td>
+          <td class="py-2 border-b border-slate-200 max-w-[200px] overflow-hidden break-words" style="word-break: break-word;">${displayName}</td>
           <td class="py-2 border-b border-slate-200 text-right">${formatCurrency(item.price)}</td>
           <td class="py-2 border-b border-slate-200 text-right">${item.quantity}</td>
           <td class="py-2 border-b border-slate-200 text-right">${formatCurrency(item.total)}</td>
@@ -282,16 +284,23 @@ export default function BillGenerator({
       let y = 78;
       
       bill.items.forEach((item) => {
-        // Split long item names into multiple lines if necessary
+        // Truncate and split long item names into multiple lines if necessary
+        let displayName = item.name;
+        if (displayName.length > 50) {
+          displayName = displayName.substring(0, 47) + "...";
+        }
+        
         const maxWidth = 75; // Maximum width for item name column
-        const itemNameLines = doc.splitTextToSize(item.name, maxWidth);
+        const itemNameLines = doc.splitTextToSize(displayName, maxWidth);
         
         // Calculate line height based on number of lines
         const lineHeight = 5;
-        const rowHeight = Math.max(8, itemNameLines.length * lineHeight);
+        // Limit to max 2 lines to prevent excessive space
+        const linesCount = Math.min(itemNameLines.length, 2);
+        const rowHeight = Math.max(8, linesCount * lineHeight);
         
-        // Print each line of the item name
-        for (let i = 0; i < itemNameLines.length; i++) {
+        // Print each line of the item name (max 2 lines)
+        for (let i = 0; i < linesCount; i++) {
           doc.text(itemNameLines[i], 20, y + (i * lineHeight));
         }
         
@@ -324,7 +333,7 @@ export default function BillGenerator({
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
       doc.text("Thank you for your business!", 105, 250, { align: "center" });
-      doc.text("Generated with BillMaker", 105, 255, { align: "center" });
+      doc.text("Generated with BillBuddy", 105, 255, { align: "center" });
       
       // Save the PDF
       doc.save(`Invoice-${bill.id.slice(-3)}.pdf`);
@@ -430,7 +439,9 @@ export default function BillGenerator({
               <tbody className="bg-white divide-y divide-slate-200">
                 {billItems.map((item, index) => (
                   <tr key={index}>
-                    <td className="px-4 py-3 whitespace-normal break-words max-w-xs">{item.name}</td>
+                    <td className="px-4 py-3 whitespace-normal break-words max-w-[200px] overflow-hidden">
+                      {item.name.length > 50 ? item.name.substring(0, 47) + "..." : item.name}
+                    </td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">{formatCurrency(item.price)}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">{item.quantity}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-right font-medium">{formatCurrency(item.total)}</td>
