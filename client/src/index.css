@@ -8,12 +8,12 @@
   }
 
   body {
-    @apply font-sans antialiased bg-slate-50 text-foreground;
+    @apply font-sans antialiased text-foreground;
   }
   
-  /* Purple app theme */
+  /* Purple app theme based on the design in the images */
   .app-background {
-    @apply bg-gradient-to-b from-purple-100 to-purple-50;
+    @apply bg-purple-100/70;
   }
   
   .header-background {
@@ -21,7 +21,20 @@
   }
   
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-violet-500 font-bold;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-purple-400 font-bold;
+  }
+  
+  /* Animation utilities */
+  .button-pop {
+    @apply transition-all duration-200;
+  }
+  
+  .button-pop:hover {
+    @apply transform scale-[1.02];
+  }
+  
+  .button-pop:active {
+    @apply transform scale-[0.98];
   }
   
   /* Dashboard cards */
@@ -29,24 +42,43 @@
     @apply bg-white rounded-lg shadow-sm border-0 transition-all duration-200 overflow-hidden p-5;
   }
   
-  .stats-card-purple {
-    @apply bg-gradient-to-br from-purple-100 to-purple-50 rounded-lg shadow-sm border-0;
+  .card-with-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:border-purple-200;
   }
   
-  .stats-card-blue {
-    @apply bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg shadow-sm border-0;
+  .purple-gradient-bg {
+    @apply bg-gradient-to-r from-purple-600 to-purple-400;
   }
   
-  .stats-card-amber {
-    @apply bg-gradient-to-br from-amber-100 to-amber-50 rounded-lg shadow-sm border-0;
+  .purple-card {
+    @apply bg-gradient-to-br from-purple-100 to-purple-50 rounded-lg;
   }
   
-  .stats-card-green {
-    @apply bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-lg shadow-sm border-0;
+  .blue-card {
+    @apply bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg;
   }
   
-  .stats-icon {
-    @apply rounded-full bg-primary/10 p-2 text-primary;
+  .amber-card {
+    @apply bg-gradient-to-br from-amber-100 to-amber-50 rounded-lg;
+  }
+  
+  .green-card {
+    @apply bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-lg;
+  }
+  
+  /* Card background effects */
+  .bg-blur-effect {
+    @apply relative overflow-hidden;
+  }
+  
+  .bg-blur-effect::before {
+    content: "";
+    @apply absolute rounded-full bg-purple-400/20 w-32 h-32 -right-10 -bottom-10 blur-2xl;
+  }
+  
+  .bg-blur-effect::after {
+    content: "";
+    @apply absolute rounded-full bg-purple-400/10 w-24 h-24 -left-10 -top-10 blur-xl;
   }
   
   /* Tab styling */
@@ -63,16 +95,16 @@
   }
   
   /* Buttons */
-  .primary-button {
-    @apply bg-purple-600 hover:bg-purple-700 text-white transition-all duration-200 rounded-lg font-medium;
+  .btn-primary {
+    @apply bg-purple-600 hover:bg-purple-700 text-white transition-all duration-200 rounded-md font-medium;
   }
   
-  .secondary-button {
-    @apply bg-purple-100 hover:bg-purple-200 text-purple-700 transition-all duration-200 rounded-lg font-medium;
+  .btn-secondary {
+    @apply bg-purple-100 hover:bg-purple-200 text-purple-700 transition-all duration-200 rounded-md font-medium;
   }
   
-  .outline-button {
-    @apply bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 transition-all duration-200 rounded-lg font-medium;
+  .btn-outline {
+    @apply bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 transition-all duration-200 rounded-md font-medium;
   }
   
   /* Step indicators */
@@ -94,6 +126,155 @@
   }
 
   .card-hover:hover {
-    @apply shadow-md;
+    @apply shadow-md border-purple-200;
+  }
+  
+  /* Invoice design */
+  .invoice-header {
+    @apply flex justify-between items-start border-b pb-6 mb-6;
+  }
+  
+  .invoice-table {
+    @apply w-full border-collapse;
+  }
+  
+  .invoice-table th {
+    @apply border-b border-gray-200 py-3 px-2 text-left text-sm font-medium text-gray-500;
+  }
+  
+  .invoice-table td {
+    @apply border-b border-gray-100 py-3 px-2 text-sm;
+  }
+  
+  .invoice-table tr:last-child td {
+    @apply border-b-0;
+  }
+  
+  .invoice-footer {
+    @apply mt-8 pt-6 border-t border-gray-100 text-xs text-gray-500;
+  }
+  
+  /* Status badges */
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .status-paid {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .status-unpaid {
+    @apply bg-amber-100 text-amber-800;
+  }
+  
+  .status-pending {
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .status-cancelled {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  /* Form styles */
+  .form-group {
+    @apply mb-4;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+  
+  .form-input {
+    @apply w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500;
+  }
+  
+  .form-hint {
+    @apply mt-1 text-xs text-gray-500;
+  }
+  
+  .form-error {
+    @apply mt-1 text-xs text-red-500;
+  }
+  
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400;
+  }
+  
+  /* Animation classes */
+  .fade-in {
+    animation: fadeIn 0.3s ease-in-out forwards;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .slide-in-right {
+    animation: slideInRight 0.3s ease-in-out forwards;
+  }
+  
+  @keyframes slideInRight {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  .slide-in-up {
+    animation: slideInUp 0.3s ease-in-out forwards;
+  }
+  
+  @keyframes slideInUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  /* Wave animation background for the app */
+  .wave-bg {
+    @apply relative overflow-hidden;
+  }
+  
+  .wave-bg::before {
+    content: "";
+    @apply absolute inset-0 opacity-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%238B5CF6' fill-opacity='1' d='M0,288L60,272C120,256,240,224,360,213.3C480,203,600,213,720,224C840,235,960,245,1080,234.7C1200,224,1320,192,1380,176L1440,160L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: cover;
+    z-index: -1;
+  }
+  
+  /* Responsive table for bills */
+  .responsive-table {
+    @apply w-full;
+  }
+  
+  @media (max-width: 768px) {
+    .responsive-table thead {
+      @apply hidden;
+    }
+    
+    .responsive-table tbody tr {
+      @apply block border rounded-lg p-3 mb-3 shadow-sm;
+    }
+    
+    .responsive-table tbody td {
+      @apply block text-right py-1.5 border-b-0 relative pl-[50%];
+    }
+    
+    .responsive-table tbody td::before {
+      content: attr(data-label);
+      @apply absolute left-0 text-left font-medium text-gray-600;
+    }
+    
+    .responsive-table tbody td:last-child {
+      @apply border-b-0;
+    }
   }
 }

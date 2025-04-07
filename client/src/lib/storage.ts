@@ -133,9 +133,13 @@ export const storage = {
   },
 
   // Bill History
-  getBillHistory: (): Bill[] => {
+  getBills: (): Bill[] => {
     const stored = localStorage.getItem(BILL_HISTORY_KEY);
     return stored ? JSON.parse(stored) : [];
+  },
+
+  getBillHistory: (): Bill[] => {
+    return storage.getBills(); // Alias for backward compatibility
   },
 
   saveBillHistory: (history: Bill[]): void => {
@@ -143,13 +147,13 @@ export const storage = {
   },
 
   addBill: (bill: Bill): void => {
-    const history = storage.getBillHistory();
+    const history = storage.getBills();
     history.unshift(bill); // Add to beginning of array
     storage.saveBillHistory(history);
   },
 
   updateBill: (bill: Bill): void => {
-    const history = storage.getBillHistory();
+    const history = storage.getBills();
     const index = history.findIndex((b) => b.id === bill.id);
     if (index !== -1) {
       history[index] = bill;
@@ -157,8 +161,14 @@ export const storage = {
     }
   },
 
+  deleteBill: (id: string): void => {
+    const history = storage.getBills();
+    const filtered = history.filter((bill) => bill.id !== id);
+    storage.saveBillHistory(filtered);
+  },
+
   getBillById: (id: string): Bill | undefined => {
-    const history = storage.getBillHistory();
+    const history = storage.getBills();
     return history.find((bill) => bill.id === id);
   },
 
@@ -195,9 +205,9 @@ export const storage = {
     }
   },
 
-  deleteCustomer: (name: string): void => {
+  deleteCustomer: (customer: Customer): void => {
     const customers = storage.getCustomers();
-    const filtered = customers.filter((c) => c.name !== name);
+    const filtered = customers.filter((c) => c.name !== customer.name);
     storage.saveCustomers(filtered);
   },
 
@@ -231,6 +241,16 @@ export const storage = {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const billCount = storage.getBillHistory().length + 1;
     return `${prefix}/${year}${month}/${billCount.toString().padStart(4, '0')}`;
+  },
+  
+  // Data management
+  resetData: (): void => {
+    localStorage.removeItem(SHOP_DETAILS_KEY);
+    localStorage.removeItem(INVENTORY_KEY);
+    localStorage.removeItem(BILL_HISTORY_KEY);
+    localStorage.removeItem(CATEGORIES_KEY);
+    localStorage.removeItem(SETTINGS_KEY);
+    localStorage.removeItem(CUSTOMERS_KEY);
   },
 };
 
