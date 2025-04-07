@@ -297,12 +297,32 @@ export default function ViewBill() {
           doc.rect(margin, yPos, pageWidth - margin * 2, 7, 'F');
         }
         
-        doc.text(item.name, margin + 2, yPos + 5);
-        doc.text(formatCurrency(item.price), margin + 90, yPos + 5);
-        doc.text(item.quantity.toString(), margin + 115, yPos + 5);
-        doc.text(formatCurrency(item.total), margin + 135, yPos + 5);
+        // Split long item names into multiple lines if necessary
+        const maxWidth = 80; // Maximum width for item name column
+        const itemNameLines = doc.splitTextToSize(item.name, maxWidth);
         
-        yPos += 7;
+        // Calculate row height based on number of lines
+        const lineHeight = 5;
+        const rowHeight = Math.max(7, itemNameLines.length * lineHeight);
+        
+        // Draw rectangle for alternate rows with adjusted height
+        if (isAlternateRow) {
+          doc.setFillColor(250, 250, 255);
+          doc.rect(margin, yPos, pageWidth - margin * 2, rowHeight, 'F');
+        }
+        
+        // Print each line of the item name
+        for (let i = 0; i < itemNameLines.length; i++) {
+          doc.text(itemNameLines[i], margin + 2, yPos + 5 + (i * lineHeight));
+        }
+        
+        // Print other columns at the vertical center of the row
+        const verticalCenter = yPos + (rowHeight / 2);
+        doc.text(formatCurrency(item.price), margin + 90, verticalCenter);
+        doc.text(item.quantity.toString(), margin + 115, verticalCenter);
+        doc.text(formatCurrency(item.total), margin + 135, verticalCenter);
+        
+        yPos += rowHeight;
       });
       
       // Summary section
@@ -341,12 +361,13 @@ export default function ViewBill() {
         doc.text("Notes:", margin, yPos);
         yPos += lineHeight;
         doc.setFont("helvetica", "normal");
-        doc.text(bill.notes, margin, yPos);
+        const notesText = bill.notes || ""; // Ensure notes is not undefined
+        doc.text(notesText, margin, yPos);
       }
       
       // Terms and conditions
       if (bill.termsAndConditions || shopDetails.termsAndConditions) {
-        const terms = bill.termsAndConditions || shopDetails.termsAndConditions;
+        const terms = (bill.termsAndConditions || shopDetails.termsAndConditions || "").toString();
         yPos += lineHeight * 2;
         doc.setFont("helvetica", "bold");
         doc.text("Terms and Conditions:", margin, yPos);
@@ -354,7 +375,8 @@ export default function ViewBill() {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         
-        const termsLines = doc.splitTextToSize(terms, pageWidth - margin * 2);
+        // Make sure terms is a string before splitting
+        const termsLines = doc.splitTextToSize(terms.toString(), pageWidth - margin * 2);
         doc.text(termsLines, margin, yPos);
       }
       
@@ -683,7 +705,7 @@ export default function ViewBill() {
                 <TableBody>
                   {bill.items.map((item, index) => (
                     <TableRow key={item.id || index}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell className="font-medium whitespace-normal break-words max-w-xs">{item.name}</TableCell>
                       <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
                       <TableCell className="text-right">{formatCurrency(item.total)}</TableCell>

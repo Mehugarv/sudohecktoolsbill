@@ -129,12 +129,22 @@ export default function BillGenerator({
     
     const newBill: Bill = {
       id: generateId(),
-      customer: customerName.trim() || "Guest Customer",
+      customer: {
+        name: customerName.trim() || "Guest Customer",
+        customerType: "individual"
+      },
       date: billDate,
+      createdAt: new Date().toISOString(),
       items: [...billItems],
       subtotal,
       tax,
-      total
+      taxRate: 10,
+      total,
+      paymentMethod: "cash",
+      discountType: "none",
+      discountValue: 0,
+      discountAmount: 0,
+      isPaid: false
     };
     
     storage.addBill(newBill);
@@ -179,7 +189,7 @@ export default function BillGenerator({
     if (printShopGst) printShopGst.textContent = shopDetails.gst ? `GST: ${shopDetails.gst}` : '';
     if (printInvoiceId) printInvoiceId.textContent = bill.id.slice(-3);
     if (printDate) printDate.textContent = getFormattedDate(bill.date);
-    if (printCustomerName) printCustomerName.textContent = bill.customer;
+    if (printCustomerName) printCustomerName.textContent = bill.customer.name;
     
     // Populate items
     if (printItems) {
@@ -252,7 +262,7 @@ export default function BillGenerator({
       doc.setFontSize(11);
       doc.text(`Invoice #: ${bill.id.slice(-3)}`, 20, 48);
       doc.text(`Date: ${getFormattedDate(bill.date)}`, 20, 54);
-      doc.text(`Customer: ${bill.customer}`, 150, 48, { align: "right" });
+      doc.text(`Customer: ${bill.customer.name}`, 150, 48, { align: "right" });
       
       doc.line(20, 60, 190, 60);
       
@@ -270,11 +280,26 @@ export default function BillGenerator({
       let y = 78;
       
       bill.items.forEach((item) => {
-        doc.text(item.name, 20, y);
-        doc.text(formatCurrency(item.price), 100, y);
-        doc.text(item.quantity.toString(), 130, y);
-        doc.text(formatCurrency(item.total), 160, y);
-        y += 8;
+        // Split long item names into multiple lines if necessary
+        const maxWidth = 75; // Maximum width for item name column
+        const itemNameLines = doc.splitTextToSize(item.name, maxWidth);
+        
+        // Calculate line height based on number of lines
+        const lineHeight = 5;
+        const rowHeight = Math.max(8, itemNameLines.length * lineHeight);
+        
+        // Print each line of the item name
+        for (let i = 0; i < itemNameLines.length; i++) {
+          doc.text(itemNameLines[i], 20, y + (i * lineHeight));
+        }
+        
+        // Print other columns at the vertical center of the row
+        const verticalCenter = y + ((itemNameLines.length * lineHeight) / 2) - (lineHeight / 2);
+        doc.text(formatCurrency(item.price), 100, verticalCenter);
+        doc.text(item.quantity.toString(), 130, verticalCenter);
+        doc.text(formatCurrency(item.total), 160, verticalCenter);
+        
+        y += rowHeight;
       });
       
       doc.line(20, y, 190, y);
@@ -403,7 +428,7 @@ export default function BillGenerator({
               <tbody className="bg-white divide-y divide-slate-200">
                 {billItems.map((item, index) => (
                   <tr key={index}>
-                    <td className="px-4 py-3 whitespace-nowrap">{item.name}</td>
+                    <td className="px-4 py-3 whitespace-normal break-words max-w-xs">{item.name}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">{formatCurrency(item.price)}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">{item.quantity}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-right font-medium">{formatCurrency(item.total)}</td>
