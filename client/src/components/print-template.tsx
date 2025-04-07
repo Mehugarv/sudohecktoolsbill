@@ -22,6 +22,12 @@ export default function PrintTemplate() {
         </div>
         
         <table className="w-full mb-6">
+          <colgroup>
+            <col style={{ width: "55%" }} />
+            <col style={{ width: "15%" }} />
+            <col style={{ width: "10%" }} />
+            <col style={{ width: "20%" }} />
+          </colgroup>
           <thead className="border-b-2 border-slate-300">
             <tr>
               <th className="py-2 text-left">Item</th>
@@ -30,7 +36,7 @@ export default function PrintTemplate() {
               <th className="py-2 text-right">Total</th>
             </tr>
           </thead>
-          <tbody id="print-items">
+          <tbody id="print-items" className="break-words">
             {/* Items will be populated dynamically */}
           </tbody>
           <tfoot className="border-t border-slate-300">
@@ -39,7 +45,7 @@ export default function PrintTemplate() {
               <td id="print-subtotal" className="py-2 text-right"></td>
             </tr>
             <tr>
-              <td colSpan={3} className="py-2 text-right">Tax (10%):</td>
+              <td colSpan={3} className="py-2 text-right">Tax:</td>
               <td id="print-tax" className="py-2 text-right"></td>
             </tr>
             <tr className="border-t border-slate-300 font-bold">

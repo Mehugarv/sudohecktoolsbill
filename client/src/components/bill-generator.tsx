@@ -35,14 +35,14 @@ export default function BillGenerator({
   // Calculate totals when billItems change
   useEffect(() => {
     const newSubtotal = billItems.reduce((sum, item) => sum + item.total, 0);
-    const taxRate = 0.10; // 10% tax
+    const taxRate = shopDetails.taxRate / 100; // Convert percentage to decimal
     const newTax = newSubtotal * taxRate;
     const newTotal = newSubtotal + newTax;
     
     setSubtotal(newSubtotal);
     setTax(newTax);
     setTotal(newTotal);
-  }, [billItems]);
+  }, [billItems, shopDetails.taxRate]);
   
   const handleAddBillItem = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,7 +138,7 @@ export default function BillGenerator({
       items: [...billItems],
       subtotal,
       tax,
-      taxRate: 10,
+      taxRate: shopDetails.taxRate,
       total,
       paymentMethod: "cash",
       discountType: "none",
@@ -182,6 +182,7 @@ export default function BillGenerator({
     const printSubtotal = document.getElementById('print-subtotal');
     const printTax = document.getElementById('print-tax');
     const printTotal = document.getElementById('print-total');
+    const printTaxLabel = document.querySelector('table tfoot tr:nth-child(2) td:first-child');
     
     if (printShopName) printShopName.textContent = shopDetails.name;
     if (printShopAddress) printShopAddress.textContent = shopDetails.address;
@@ -198,7 +199,7 @@ export default function BillGenerator({
       bill.items.forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td class="py-2 border-b border-slate-200">${item.name}</td>
+          <td class="py-2 border-b border-slate-200 max-w-[250px] break-words">${item.name}</td>
           <td class="py-2 border-b border-slate-200 text-right">${formatCurrency(item.price)}</td>
           <td class="py-2 border-b border-slate-200 text-right">${item.quantity}</td>
           <td class="py-2 border-b border-slate-200 text-right">${formatCurrency(item.total)}</td>
@@ -211,6 +212,7 @@ export default function BillGenerator({
     if (printSubtotal) printSubtotal.textContent = formatCurrency(bill.subtotal);
     if (printTax) printTax.textContent = formatCurrency(bill.tax);
     if (printTotal) printTotal.textContent = formatCurrency(bill.total);
+    if (printTaxLabel) printTaxLabel.textContent = `Tax (${bill.taxRate}%):`;
     
     // Open print dialog
     const printContents = printTemplate.innerHTML;
@@ -310,7 +312,7 @@ export default function BillGenerator({
       doc.text(formatCurrency(bill.subtotal), 160, y);
       y += 8;
       
-      doc.text("Tax (10%):", 130, y);
+      doc.text(`Tax (${bill.taxRate}%):`, 130, y);
       doc.text(formatCurrency(bill.tax), 160, y);
       y += 8;
       
@@ -451,7 +453,7 @@ export default function BillGenerator({
                   <td></td>
                 </tr>
                 <tr>
-                  <td colSpan={3} className="px-4 py-3 text-right">Tax (10%):</td>
+                  <td colSpan={3} className="px-4 py-3 text-right">Tax ({shopDetails.taxRate}%):</td>
                   <td className="px-4 py-3 text-right">{formatCurrency(tax)}</td>
                   <td></td>
                 </tr>

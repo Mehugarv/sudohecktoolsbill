@@ -261,7 +261,12 @@ export const generateId = (): string => {
 export const formatCurrency = (value: number, currencySymbol?: string): string => {
   const shopDetails = storage.getShopDetails();
   const symbol = currencySymbol || shopDetails.currency || "$";
-  return symbol + value.toFixed(2);
+  
+  // Format the number with proper spacing
+  const formattedValue = value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  
+  // Return the formatted currency with the symbol
+  return symbol + " " + formattedValue;
 };
 
 export const getPaymentMethodLabel = (method: string): string => {
